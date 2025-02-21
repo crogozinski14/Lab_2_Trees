@@ -1,0 +1,416 @@
+---
+title: "Lab_2_Trees"
+author: "Chloe Rogozinski"
+format: html
+editor: visual
+---
+
+```{r}
+library(dplyr)
+```
+
+
+## Question 1
+```{r}
+#1
+#load tree data and view rows
+library(dplyr)
+tree_dat %>% summarise(n = n())
+
+```
+
+```{r}
+nrow(tree_dat)
+```
+
+
+## Question 2
+```{r}
+#2
+#Identify unique species in data
+tree_dat %>%
+  filter(standID == 1) %>%
+  tally()
+```
+
+Answer: 979
+
+
+## Question 3
+```{r}
+#3
+#find the first and last year recorded for each stand
+tree_count1 <- tree_dat %>%
+  filter(standID == 1)
+
+
+print(tree_count1)
+
+```
+
+```{r}
+#3 cont.
+
+tree_dat %>%
+  filter(species %in% c("ABBA", "PIST")) %>%
+  count(species)
+```
+
+Answer: ABBA - 13,033 & PIST - 4188
+
+## Question 4
+
+```{r}
+#4
+#find how many trees are older than 200 years
+last_year <- max(tree_dat$year, na.rm = TRUE)
+
+tree_dat %>%
+  filter(year == last_year, age > 200) %>%
+  tally() 
+
+```
+
+Answer: 7
+
+## Question 5
+```{r}
+#5 
+#find oldest tree in dataset
+tree_dat %>% 
+  slice_max(order_by = age, n = 1)
+```
+
+```{r}
+oldest_tree <- tree_dat %>%
+  slice_max(order_by = age, n = 1)
+
+print(oldest_tree)
+```
+
+Answer: Tree 24 is 269
+
+## Question 6
+
+```{r}
+#6
+#Find oldest 5 trees in 2001
+tree_dat %>%
+  filter(year == 2001) %>%
+  slice_max(order_by = age, n = 5)
+
+oldest_trees_2001 <- tree_dat %>%
+  filter(year == 2001) %>%
+  slice_max(order_by = age, n = 5)
+print(oldest_trees_2001)
+
+```
+
+Answer: Trees 24, 25, 1595, 1598, and 1712 are the oldest trees recorded in year 2001.
+
+## Question 7
+
+```{r}
+#7
+#find how many trees are in a 30% sample in 2002
+  sampled_trees <- tree_dat %>%
+  slice_sample(prop = 0.3) 
+  
+  sample_size <- nrow(sampled_trees)
+
+print(sample_size)
+
+```
+
+Answer: In 30% of the sample recorded in 2002 there were 39415 trees in this grouping.
+
+## Question 8
+
+```{r}
+#8
+#Sort all trees in stand 5 in 2007 in descending radius and show top 3 trees.
+tree_dat %>%
+  filter(standID == 5, year == 2007) %>%
+  count()
+
+
+top_trees_2007 <- tree_dat %>%
+  filter(standID == 5, year == 2007) %>%
+  arrange(desc(rad_ib)) %>%
+  slice_head(n=3)
+
+
+top_trees_2007
+
+```
+
+Answer: The top three trees in descending order by radius at breast height are 128, 157, and 135.
+
+## Question 9
+
+```{r}
+#9
+#Filter to treeID, stand, year, and radius in stand 3 from 2007 and pull the smallest three trees
+smallest_trees_2007 <- tree_dat %>%
+  select(treeID, standID, year, rad_ib) %>%
+  filter(standID == 3, year == 2007) %>%
+  slice_min(order_by = rad_ib, n = 3)
+smallest_trees_2007
+```
+
+Answer: In stand 3 from 2007 the trees with the smallest radius measured that year are trees 50,56, and, 36.
+
+## Question 10
+
+```{r}
+#10
+#Remove the stand column and glimpse
+tree_data_no_stand <- tree_dat %>%
+  select(-standID)
+
+glimpse(tree_data_no_stand)
+```
+
+Answer: above
+
+## Question 11
+
+```{r}
+#11
+#selectselect columns with string ID name and use glimpse
+tree_data_IDs <- tree_dat %>% 
+  select(contains("ID"))
+
+glimpse(tree_data_IDs)
+```
+
+Answer: Glimpse above
+
+## Question 12
+```{r}
+#12
+#Find a patter that has all columns with ID or stand in name. Use glimpse
+tree_data_selected <- tree_dat %>%
+  select(contains("ID"), contains("stand"))
+
+glimpse(tree_data_selected)
+```
+
+Answer: Glimpse above
+
+## Question 13
+```{r}
+#13
+#rename rad_inc to include unit in name
+tree_dat <- tree_dat %>%
+  rename( inc_cm = inc)
+
+glimpse(tree_dat)
+```
+
+Answer: In the table above the rad_ib and inc_cm changed
+
+## Question 14
+```{r}
+#14
+#Compute DBH in cm and calculate the mean BA_M2 for POTR in 2007
+tree_dat <- tree_dat %>%
+  mutate(DBH_cm = 2 * rad_ib, BA_m2 = 0.0000784 * (DBH_cm^2))
+
+mean_BA_POTR_2007 <- tree_dat %>%
+  filter(species == "POTR", year == 2007) %>%
+  summarise(mean_BA_m2 = mean(BA_m2, na.rm = TRUE))
+
+mean_BA_POTR_2007
+```
+
+Answer: The mean BA_M2 of the species POTR in 2007 is 3.690029
+
+## Question 15
+```{r}
+#15
+#find records for the amount of established trees in the data set greater than 5 years
+tree_dat <- tree_dat %>%
+  mutate(established = if_else(age > 5, TRUE,FALSE))
+
+tree_dat %>%
+  count(established)
+```
+
+Answer: There were 8883 trees that are established in the tree data.
+
+```{r}
+#code from the lab handout
+case_when(
+  condition1 ~ result1,
+  condition2 ~ result2,
+  condition3 ~ result3,
+  TRUE ~ default_result
+)
+```
+
+## Question 16
+```{r}
+#16
+# Classify each tree by DBH_Class
+tree_data <- tree_dat %>%
+  mutate(DBH_class = case_when(DBH_cm < 10 ~ "<10 cm",
+                              DBH_cm >= 10 & DBH_cm < 20 ~ "10-19.9 cm",
+                              DBH_cm >= 20 & DBH_cm < 30 ~ "20-29.9 cm",
+                              DBH_cm >= 30 & DBH_cm < 40 ~ "30-39.9 cm",
+                              DBH_cm >= 40 ~ "40+ cm",
+                              TRUE ~ "Unknown"))
+```
+
+```{r}
+#filter 2007 and count
+dbh_class_counts_2007 <- tree_data %>%
+  filter(year == 2007) %>%
+  count(DBH_class, sourt = TRUE)
+print(dbh_class_counts_2007)
+```
+
+Answer: The number of each class with count in the year 2007 is 2291.
+
+## Question 17
+
+```{r}
+#compute mean and standard deviation
+
+dbh_summary_2007 <- tree_dat %>%
+  summarize(mean_DBH_cm = mean(DBH_cm, na.rm = TRUE), sd_DBH_cm = sd(DBH_cm, na.rm = TRUE))
+
+print(dbh_summary_2007)
+
+```
+
+Answer: The mean DBH in cm with the standard deviation in cm for all trees in 2007 is 115.3241 cm and 64.67803 cm.
+
+```{r}
+#from lab handout
+trees_by_id <- group_by(trees, treeID)
+glimpse(trees_by_id)
+
+#> Rows: 131,386
+#> Columns: 13
+#> Groups: treeID [2,291]
+#> $ treeID    <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
+#> $ standID   <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
+#> $ stand     <chr> "A1", "A1", "A1", "A1", "A1", "A1", "A1", "A1", "A1", "A1", "A1"…
+#> $ year      <int> 1960, 1961, 1962, 1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970…
+#> ...
+```
+
+## Question 18
+
+```{r}
+#Mean age per species for 2003
+
+species_mean_age_2003 <- tree_dat %>%
+  filter(year == 2003) %>%
+  group_by(species) %>%
+  summarize(mean_age = mean(age, na.rm = TRUE), .groups = "drop") %>%
+  arrange(desc(mean_age)) %>%
+  slice_head(n = 3)
+
+print(species_mean_age_2003)
+```
+
+Answer: the per speciies mean tree age for the top 3 oldest trees in 2003 are 126 for THOC, 83 for FRNI, and 73 for PIST.
+
+## Question 19
+
+```{r}
+# number of unique years, first, and last in a summary
+
+year_summary <- tree_data %>% 
+  summarize( unique_years = min(year, na.rm = TRUE), last_year = max(year, na.rm = TRUE))
+print(year_summary)
+```
+
+Answer: The number of unique years is 1879 and the last year recorded is 2007.
+
+## Question 20
+
+```{r}
+#unique years per stand and stand tied for the largest number
+
+stands_largest_temporal_record <- tree_data %>% group_by(standID) %>% summarize(unique_years = n_distinct(year), .groups = "drop") %>%
+  slice_max(order_by = unique_years, with_ties = TRUE)
+
+print(stands_largest_temporal_record)
+```
+
+Answer: The stands with the largest number of unique years are stands 1, 15, 16, 17, and 24 with 111.
+
+## Question 21
+
+```{r}
+#Find annual DBH growth using lag
+tree_growth <- tree_data %>%
+  arrange(treeID, year) %>%
+  group_by(treeID) %>%
+  mutate(annual_growth = DBH_cm - lag(DBH_cm)) %>%
+  filter(!is.na(annual_growth))
+```
+
+```{r}
+#Filter for trees with >=10 years of growth data
+tree_growth_filtered <- tree_growth %>%
+  group_by(treeID) %>%
+  filter(n() >= 10)
+```
+
+```{r}
+#find mean and std of annual growth per species
+species_growth_stats <- tree_growth_filtered %>%
+  group_by(species) %>%
+  summarize( mean_growth = mean(annual_growth, na.rm = TRUE),
+  sd_growth = sd(annual_growth, na.rm = TRUE),
+  .groups = "drop")
+```
+
+```{r}
+#top 3 fastest growing species
+fastest_species <- species_growth_stats %>%
+  arrange(desc(mean_growth)) %>%
+  slice_head(n = 3)
+
+#top slowest trees
+slowest_species <- species_growth_stats %>%
+  arrange(mean_growth) %>%
+  slice_head(n = 3)
+
+#print top 3 fastest
+print("top 3 Fastest Growing Species")
+print(fastest_species)
+
+#print top 3 slowest
+print("top 3 Slowest Growing Species")
+print(slowest_species)
+```
+
+Answer: The fastest growing tree species from this data was the PIRE Species.
+
+IMG: ![](IMG/resinosa01.jpg)
+
+\## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
