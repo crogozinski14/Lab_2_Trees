@@ -9,8 +9,8 @@ editor: visual
 library(dplyr)
 ```
 
-
 ## Question 1
+
 ```{r}
 #1
 #load tree data and view rows
@@ -23,8 +23,8 @@ tree_dat %>% summarise(n = n())
 nrow(tree_dat)
 ```
 
-
 ## Question 2
+
 ```{r}
 #2
 #Identify unique species in data
@@ -35,8 +35,8 @@ tree_dat %>%
 
 Answer: 979
 
-
 ## Question 3
+
 ```{r}
 #3
 #find the first and last year recorded for each stand
@@ -74,6 +74,7 @@ tree_dat %>%
 Answer: 7
 
 ## Question 5
+
 ```{r}
 #5 
 #find oldest tree in dataset
@@ -187,6 +188,7 @@ glimpse(tree_data_IDs)
 Answer: Glimpse above
 
 ## Question 12
+
 ```{r}
 #12
 #Find a patter that has all columns with ID or stand in name. Use glimpse
@@ -199,6 +201,7 @@ glimpse(tree_data_selected)
 Answer: Glimpse above
 
 ## Question 13
+
 ```{r}
 #13
 #rename rad_inc to include unit in name
@@ -211,6 +214,7 @@ glimpse(tree_dat)
 Answer: In the table above the rad_ib and inc_cm changed
 
 ## Question 14
+
 ```{r}
 #14
 #Compute DBH in cm and calculate the mean BA_M2 for POTR in 2007
@@ -227,6 +231,7 @@ mean_BA_POTR_2007
 Answer: The mean BA_M2 of the species POTR in 2007 is 3.690029
 
 ## Question 15
+
 ```{r}
 #15
 #find records for the amount of established trees in the data set greater than 5 years
@@ -250,6 +255,7 @@ case_when(
 ```
 
 ## Question 16
+
 ```{r}
 #16
 # Classify each tree by DBH_Class
